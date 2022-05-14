@@ -24,9 +24,9 @@ This role is more meant to be added to an role but can be also used to install a
 
     - hosts: synology
       roles:
-         - role: wz.synology-tun,
+         - role: wz.synology-tun
            vars:
-            synology_tun__scripts_home: 'docker-compose-project'
+            synology_tun__scripts_home: '/opt/synology_tun/'
             synology_tun__state: 'present'
 
 ## Example Role Task
@@ -35,7 +35,7 @@ This role is more meant to be added to an role but can be also used to install a
       include_role:
         name: wz.synology-tun
       vars:
-        synology_tun__scripts_home: 'docker-compose-project'
+        synology_tun__scripts_home: '/opt/synology_tun/'
         synology_tun__state: 'present'
 
 ## License
