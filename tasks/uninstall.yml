@@ -8,16 +8,17 @@
   become: true
   ansible.builtin.systemd:
     name: "synology-tun.service"
-  register: service_state
+  register: current_service_state
 
-- name: stop timer
+- name: stop service
   become: true
   ansible.builtin.systemd:
     name: "synology-tun.service"
     state: stopped
     enabled: no
-  notify: reload systemd daemons
-  when: service_state.status and service_state.status.ActiveState == "active"
+  when: current_service_state.status and current_service_state.status.ActiveState != "stopped"
+  register: service_state
+  failed_when: service_state.status.ActiveState == "failed"
 
 - name: Remove files
   become: true
@@ -26,9 +27,16 @@
     state: absent
   with_items:
     - "{{ synology_tun__scripts_home }}/synology-tun.sh"
-    - "/etc/systemd/system/synology-tun.service"
+    - "{{ synology_tun__systemd_home }}/synology-tun.service"
 
 - name: reload systemd daemons
   become: True
   ansible.builtin.systemd:
     daemon_reload: yes
+
+- name: Remove target path
+  become: true
+  file:
+    dest: "{{ synology_tun__scripts_home }}/"
+    state: absent
+  changed_when: false

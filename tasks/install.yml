@@ -20,7 +20,7 @@
   become: true
   template:
     src: "synology-tun.service.j2"
-    dest: "/etc/systemd/system/synology-tun.service"
+    dest: "{{ synology_tun__systemd_home }}/synology-tun.service"
     mode: "0644"
   changed_when: false
 
@@ -34,3 +34,6 @@
   ansible.builtin.systemd:
     name: "synology-tun.service"
     enabled: "{{ 'yes' if synology_tun__state == 'present' else 'no' }}"
+    state: started
+  register: service_state
+  failed_when: service_state.status.ActiveState == "failed"

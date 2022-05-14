@@ -11,10 +11,10 @@ Nothing
 
 ## Role Variables
 
-| Variable Name                | Type   | Purpose                                               | Default                       | Required |
-| ---------------------------- | ------ | ----------------------------------------------------- | ----------------------------- | -------- |
-| `synology_tun__scripts_home` | String | location where the start/stop script should be placed | `/opt/docker-compose-project` | Yes      |
-| `synology_tun__state`        | String | state, absent will uninstall the service              | `present, absent`             | No       |
+| Variable Name                | Type   | Purpose                                               | Default             | Required |
+| ---------------------------- | ------ | ----------------------------------------------------- | ------------------- | -------- |
+| `synology_tun__scripts_home` | String | location where the start/stop script should be placed | `/opt/synology_tun` | Yes      |
+| `synology_tun__state`        | String | state, absent will uninstall the service              | `present, absent`   | No       |
 
 ## Dependencies
 

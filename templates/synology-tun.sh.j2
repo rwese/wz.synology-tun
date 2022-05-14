@@ -21,7 +21,7 @@ start_modules(){
         if [ $(echo -n "$INSMOD_RESP" | grep -c "File exists") -eq 1 ]; then
             echo "module \"$i\" already loaded"
 
-            exit 1
+            exit 0
         fi
 
         if [ $INSMOD_RESP_CODE -ne 0 ]; then
