@@ -1,0 +1,34 @@
+---
+- name: reload systemd daemons
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+- name: Get Service Status
+  become: true
+  ansible.builtin.systemd:
+    name: "synology-tun.service"
+  register: service_state
+
+- name: stop timer
+  become: true
+  ansible.builtin.systemd:
+    name: "synology-tun.service"
+    state: stopped
+    enabled: no
+  notify: reload systemd daemons
+  when: service_state.status and service_state.status.ActiveState == "active"
+
+- name: Remove files
+  become: true
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ synology_tun__scripts_home }}/synology-tun.sh"
+    - "/etc/systemd/system/synology-tun.service"
+
+- name: reload systemd daemons
+  become: True
+  ansible.builtin.systemd:
+    daemon_reload: yes

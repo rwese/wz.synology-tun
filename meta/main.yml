@@ -1,0 +1,25 @@
+galaxy_info:
+  author: Rene Weselowski
+  description: Setup systemd service start tun device drivers on synology nas
+
+  license: MIT
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - all
+    - name: Debian
+      versions:
+        - all
+    - name: GenericLinux
+      versions:
+        - all
+
+  min_ansible_version: "2.1"
+
+  galaxy_tags:
+    - systemd
+    - nas
+    - synology
+
+dependencies: []

@@ -1,0 +1,3 @@
+---
+synology_tun__state: "present"
+synology_tun__scripts_home: "/opt/synology_tun"

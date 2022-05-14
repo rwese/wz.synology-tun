@@ -1,0 +1,73 @@
+#!/bin/bash
+MODULES_DIR="/lib/modules"
+MODULES_START="tun.ko"
+MODULES_STOP="tun.ko"
+
+start_modules(){
+    if ( [ ! -c /dev/net/tun ] ); then
+        if ( [ ! -d /dev/net ] ); then
+            mkdir -m 755 /dev/net
+        fi
+
+        mknod /dev/net/tun c 10 200
+    fi
+
+    echo "--- Load modules ---"
+    for i in $MODULES_START; do
+        echo "Loading \"$i\""
+        INSMOD_RESP=$( insmod "$MODULES_DIR/$i" 2>&1 )
+        INSMOD_RESP_CODE=$?
+
+        if [ $(echo -n "$INSMOD_RESP" | grep -c "File exists") -eq 1 ]; then
+            echo "module \"$i\" already loaded"
+
+            exit 1
+        fi
+
+        if [ $INSMOD_RESP_CODE -ne 0 ]; then
+            echo "Failed to load \"$i\""
+            echo "$INSMOD_RESP"
+
+        fi
+
+        exit $INSMOD_RESP_CODE
+    done
+}
+
+stop_modules(){
+    echo "--- Unload modules ---"
+    for i in $MODULES_STOP; do
+        echo "Unloading \"$i\""
+        RMMOD_RESP=$( rmmod "$MODULES_DIR/$i" 2>&1 )
+        RMMOD_RESP_CODE=$?
+
+        if [ $(echo -n "$RMMOD_RESP" | grep -c "is not currently loaded") -eq 1 ]; then
+            echo "module \"$i\" not currently loaded"
+
+            exit 0
+        fi
+
+        if [ $RMMOD_RESP_CODE -ne 0 ]; then
+            echo "Failed to unload \"$i\""
+            echo "$RMMOD_RESP"
+        fi
+
+        exit $RMMOD_RESP_CODE
+    done
+}
+
+case "$1" in
+    start)
+        start_modules
+        ;;
+
+    stop)
+        stop_modules
+        ;;
+
+    *)
+        echo "usage: $0 { start | stop }" >&2
+        exit 1
+        ;;
+
+esac

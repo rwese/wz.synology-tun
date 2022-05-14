@@ -1,0 +1,36 @@
+---
+- name: Create target path
+  become: true
+  file:
+    dest: "{{ synology_tun__scripts_home }}/"
+    state: directory
+    recurse: yes
+    mode: "0775"
+  changed_when: false
+
+- name: Copy script
+  become: true
+  template:
+    src: synology-tun.sh.j2
+    dest: "{{ synology_tun__scripts_home }}/synology-tun.sh"
+    mode: "0744"
+  changed_when: false
+
+- name: Copy service
+  become: true
+  template:
+    src: "synology-tun.service.j2"
+    dest: "/etc/systemd/system/synology-tun.service"
+    mode: "0644"
+  changed_when: false
+
+- name: reload systemd daemons
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+- name: Enable a service
+  become: true
+  ansible.builtin.systemd:
+    name: "synology-tun.service"
+    enabled: "{{ 'yes' if synology_tun__state == 'present' else 'no' }}"

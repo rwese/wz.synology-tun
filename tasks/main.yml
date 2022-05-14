@@ -1,0 +1,8 @@
+---
+- name: Install synology-tun service
+  when: synology_tun__state != "absent"
+  include_tasks: install.yml
+
+- name: Uninstall synology-tun service
+  when: synology_tun__state == "absent"
+  include_tasks: uninstall.yml

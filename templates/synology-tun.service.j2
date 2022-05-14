@@ -1,0 +1,9 @@
+[Unit]
+Description=Load tun device drivers
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart={{ synology_tun__scripts_home }}/synology-tun.sh start
+RemainAfterExit=true
+ExecStop={{ synology_tun__scripts_home }}/synology-tun.sh stop
