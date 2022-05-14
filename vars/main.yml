@@ -1,2 +1,3 @@
 ---
 synology_tun__systemd_home: "/etc/systemd/system"
+synology_tun__service_name: "synology-tun.service"

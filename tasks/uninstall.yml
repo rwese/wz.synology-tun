@@ -6,9 +6,9 @@
 
 - name: Get Service Status
   become: true
-  ansible.builtin.systemd:
-    name: "synology-tun.service"
+  ansible.builtin.command: "{{ synology_tun__scripts_home }}/synology-tun.sh status"
   register: current_service_state
+  changed_when: false
 
 - name: stop service
   become: true
@@ -16,9 +16,15 @@
     name: "synology-tun.service"
     state: stopped
     enabled: no
-  when: current_service_state.status and current_service_state.status.ActiveState != "stopped"
-  register: service_state
-  failed_when: service_state.status.ActiveState == "failed"
+  when: current_service_state.stdout == "loaded"
+
+- name: "Wait until module is unloaded"
+  ansible.builtin.command: "{{ synology_tun__scripts_home }}/synology-tun.sh status"
+  register: current_service_state
+  until: current_service_state.stdout == "not loaded"
+  retries: 5
+  delay: 1
+  changed_when: false
 
 - name: Remove files
   become: true
@@ -28,11 +34,13 @@
   with_items:
     - "{{ synology_tun__scripts_home }}/synology-tun.sh"
     - "{{ synology_tun__systemd_home }}/synology-tun.service"
+  register: removed_files
 
 - name: reload systemd daemons
   become: True
   ansible.builtin.systemd:
     daemon_reload: yes
+  when: removed_files.changed
 
 - name: Remove target path
   become: true

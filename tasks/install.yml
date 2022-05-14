@@ -8,32 +8,39 @@
     mode: "0775"
   changed_when: false
 
-- name: Copy script
+- name: Copy files
   become: true
   template:
-    src: synology-tun.sh.j2
-    dest: "{{ synology_tun__scripts_home }}/synology-tun.sh"
-    mode: "0744"
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  with_items:
+    - src: synology-tun.service.j2
+      dest: "{{ synology_tun__systemd_home }}/{{ synology_tun__service_name }}"
+      mode: "0644"
+    - src: synology-tun.sh.j2
+      dest: "{{ synology_tun__scripts_home }}/synology-tun.sh"
+      mode: "0744"
   changed_when: false
-
-- name: Copy service
-  become: true
-  template:
-    src: "synology-tun.service.j2"
-    dest: "{{ synology_tun__systemd_home }}/synology-tun.service"
-    mode: "0644"
-  changed_when: false
+  register: failes_changed
 
 - name: reload systemd daemons
   become: true
   ansible.builtin.systemd:
     daemon_reload: yes
+  when: failes_changed.changed
 
 - name: Enable a service
   become: true
   ansible.builtin.systemd:
-    name: "synology-tun.service"
+    name: "{{ synology_tun__service_name }}"
     enabled: "{{ 'yes' if synology_tun__state == 'present' else 'no' }}"
     state: started
-  register: service_state
-  failed_when: service_state.status.ActiveState == "failed"
+
+- name: "Wait until {{ synology_tun__service_name }} service is active"
+  ansible.builtin.systemd:
+    name: "{{ synology_tun__service_name }}"
+  register: temp__service_state
+  until: temp__service_state.status.ActiveState == 'active'
+  retries: 5
+  delay: 1
