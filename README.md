@@ -20,23 +20,19 @@ Nothing
 
 ## Example Playbook
 
-This role is more meant to be added to an role but can be also used to install an updater for exiting docker-composes.
-
-    - hosts: synology
-      roles:
-         - role: wz.synology-tun
-           vars:
-            synology_tun__scripts_home: '/opt/synology_tun/'
-            synology_tun__state: 'present'
-
-## Example Role Task
-
-    - name: trigger wz.synology-tun role
-      include_role:
-        name: wz.synology-tun
-      vars:
-        synology_tun__scripts_home: '/opt/synology_tun/'
-        synology_tun__state: 'present'
+```yaml
+---
+- name: Setup Tun Service
+  hosts:
+    - synology
+  become: true
+  gather_facts: true
+  roles:
+    - wz.synology-tun
+  vars:
+    synology_tun__scripts_home: "/opt/synology_tun/"
+    synology_tun__state: "present"
+```
 
 ## License
 
